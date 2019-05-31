@@ -31,7 +31,8 @@ app.use("/second", SecondRoute)
 
 // Start Server ----------------------------------------------------------------
 
-app.listen(8088, () => {
+var port = process.env.PORT || 8088;
+app.listen(port, () => {
   console.log("Server is up and listening on 8088...")
 })
 
