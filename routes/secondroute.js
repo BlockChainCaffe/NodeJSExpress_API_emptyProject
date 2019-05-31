@@ -6,7 +6,10 @@ const router = express.Router();
 
 router.get("/", (req,res)=>{ 
     //...<CODE>... 
-    res.status(200).json({"message":"You hit the second route"})
+    res.status(200).json({
+        "message":"You hit the second route",
+        "decoded":req.decoded
+    })
 })
 
 

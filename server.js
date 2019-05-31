@@ -3,7 +3,6 @@
 
                         Node JS API Basic Project
 
-
 ******************************************************************************/
 
 
@@ -23,19 +22,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Serve Static content
 app.use(express.static('./public'))
 
-// External Routes
+// JWT and Auth
+const config = require("./config")
+const secret = config.secret
+var jwt = require('jsonwebtoken')
+const authmw = require("./auth/authmw")
+
+// Separate Routes
 const FirstRoute = require ("./routes/firstroute")
 const SecondRoute = require ("./routes/secondroute")
 app.use("/first", FirstRoute)
-app.use("/second", SecondRoute)
 
-// Start Server ----------------------------------------------------------------
+app.use("/second", authmw.checkToken, SecondRoute)
 
-app.listen(8088, () => {
-  console.log("Server is up and listening on 8088...")
-})
 
-// Routes ----------------------------------------------------------------------
+
+// Public Routes ---------------------------------------------------------------
 
 app.get("/", (req, res) => {
   console.log("Responding to root route")
@@ -64,7 +66,44 @@ app.post("/put", function(req,res) {
   res.json([A,B,C,D]) // return nothing
 })
 
+// This method should be under authentication
+app.get ("/inauth", authmw.checkToken, (req,res)=>{
+  res.send("You are in an authenticated area")
+})
+
+
+// Login -----------------------------------------------------------------------
+
+// Login Function
+// Check credentials (fake here) and setup the token
+app.post("/login", (req,res) => {
+  var username = req.body.username
+  var password = req.body.password
+
+  // ...some logic here...
+
+  if ( username == "admin" && password == "password") {
+      // Grant Access
+      const payload = {"user": username}
+      var token = jwt.sign( payload, secret, {"expiresIn": "2h"} )
+      res.json({
+          "success" : true,
+          "message" : "Access Granted for 2 hours",
+          "token" : token
+      })
+
+  } else {
+      // Deny Access
+      res.json({ 
+          success: false, 
+          message: 'Authentication failed.'
+      });
+  }
+})
+
+
 // Error Handling --------------------------------------------------------------
+
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
@@ -80,3 +119,11 @@ app.use((error, req, res, next) => {
     }
   });
 });
+
+
+// Start Server ----------------------------------------------------------------
+
+var port = process.env.PORT || 8088;
+app.listen(port, () => {
+  console.log("Server is up and listening on 8088...")
+})
