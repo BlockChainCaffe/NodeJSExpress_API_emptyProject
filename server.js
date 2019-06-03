@@ -35,13 +35,6 @@ app.use("/first", FirstRoute)
 
 app.use("/second", authmw.checkToken, SecondRoute)
 
-<<<<<<< HEAD
-=======
-var port = process.env.PORT || 8088;
-app.listen(port, () => {
-  console.log("Server is up and listening on 8088...")
-})
->>>>>>> 1d3e623ec638a8c324a7709f721814a332036fcc
 
 
 // Public Routes ---------------------------------------------------------------
@@ -126,7 +119,6 @@ app.use((error, req, res, next) => {
     }
   });
 });
-<<<<<<< HEAD
 
 
 // Start Server ----------------------------------------------------------------
@@ -135,5 +127,3 @@ var port = process.env.PORT || 8088;
 app.listen(port, () => {
   console.log("Server is up and listening on 8088...")
 })
-=======
->>>>>>> 1d3e623ec638a8c324a7709f721814a332036fcc
