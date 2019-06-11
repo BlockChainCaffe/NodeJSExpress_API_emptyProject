@@ -15,6 +15,7 @@ Just an empty scaffholding for a JSon API project with
 // Express
 const express = require('express')
 const app = express()
+app.set('json spaces', 4)
 
 // Log with morgan
 const morgan = require('morgan')
