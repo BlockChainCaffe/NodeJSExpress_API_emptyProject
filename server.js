@@ -147,6 +147,5 @@ app.use((error, req, res, next) => {
 
 var port = process.env.PORT || config.port;
 app.listen(port, () => {
-  console.log("Server is up and listening on "+port+""...")
+  console.log("Server is up and listening on "+port+"...")
 })
-8088
