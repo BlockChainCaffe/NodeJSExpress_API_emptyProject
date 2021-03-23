@@ -6,5 +6,9 @@ module.exports = {
     port :  '8088',
 
     // Token exire time
-    expire : '2h'
+    expire : '2h',
+
+
+    // Client IP filtering
+    ip_whitelist : ['*.*.*.*', '127.0.0.1', '::1']
   };

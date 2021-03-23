@@ -11,77 +11,81 @@ Just an empty scaffholding for a JSon API project with
 
 ******************************************************************************/
 
+// Global configuration
+const config = require("./config/config")
 
-// Express
+
+// Basic Dependecties
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
+
+
+// Express & Friends
 const express = require('express')
-const app = express()
+const ipfilter = require('express-ipfilter').IpFilter
+const xss = require('xss-clean')
+const helmet = require('helmet')
+const log4js = require('log4js');
+const logger = require('./common/logger.js').logger
+const bodyParser = require('body-parser');
 
-// Log with morgan
-const morgan = require('morgan')
-app.use(morgan('short'))
+/*****************************************************************************/
+
+// Define APP
+const app = express()
+app.set('json spaces', 4)
+
+// Whitelist only some IP addresses
+if (config.ip_whitelist) {
+  app.use(ipfilter(config.ip_whitelist, { mode: 'allow' }))
+}
+app.use(xss());
+app.use(helmet());
+app.disable('x-powered-by');
+
+// Log Http requests with log4js
+logger.level = config.loglevel
+app.use(log4js.connectLogger(logger, { level: 'auto' }))
+
 
 // post body parsing
-const bodyParser = require('body-parser');
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // Serve Static content
 app.use(express.static('./public'))
 
-// JWT and Auth
-const config = require("./config")
-const secret = config.secret
-var jwt = require('jsonwebtoken')
-const authmw = require("./auth/authmw")
+// // JWT and Auth
+// const secret = config.secret
+// let jwt = require('jsonwebtoken')
+// const authmw = require("./auth/authmw")
 
-// Separate Routes
-// First "normal" route
+// Separate Routes -------------------------------------------------------------
+
+// Note that authentication token check is called before second router module
+// const SecondRoute = require ("./routes/secondroute")
+// app.use("/second", authmw.checkToken, SecondRoute)
+
 const FirstRoute = require ("./routes/firstroute")
 app.use("/first", FirstRoute)
-// Second protected route
-// Note that authentication token check is called before passing 
-// to the second router module
-const SecondRoute = require ("./routes/secondroute")
-app.use("/second", authmw.checkToken, SecondRoute)
 
+const SecondRoute = require ("./routes/secondroute")
+app.use("/second", SecondRoute)
 
 
 // Public Local Routes ---------------------------------------------------------
 
-// Static route
-app.get("/", (req, res) => {
-  console.log("Responding to root route")
-  res.send("Hello from ROOOOOT")
-})
+// // Static route
+// app.get("/", (req, res) => {
+//   console.log("Responding to root route")
+//   res.send("Hello from ROOOOOT")
+// })
 
-// Array
-app.get("/array", (req,res)=> {
-  var A = {first:"the One", second:"the Two"}
-  var B = {first:"other One", third:"number 3"}
-  res.json([A,B])
-})
-
-// Parametric request route
-app.get("/array/:id", (req,res)=> {
-  var id = req.params.id
-  console.log ("param is "+ id)
-  res.end() // return nothing
-})
-
-// post / submission
-app.post("/put", function(req,res) {
-  var A = req.body.A
-  var B = req.body.B
-  var C = req.body.C
-  var D = req.body.D
-  console.log ("POST with " + A + B + C + D)
-  res.json([A,B,C,D]) // return nothing
-})
-
-// Single local route under authentication
-app.get ("/inauth", authmw.checkToken, (req,res)=>{
-  res.send("You are in an authenticated area")
-})
+// // Single local route under authentication
+// app.get ("/inauth", authmw.checkToken, (req,res)=>{
+//   res.send("You are in an authenticated area")
+// })
 
 
 // Login -----------------------------------------------------------------------
@@ -90,8 +94,8 @@ app.get ("/inauth", authmw.checkToken, (req,res)=>{
 // Check credentials (fake here) and setup the token
 // This route cannot be subject to authentication
 app.post("/login", (req,res) => {
-  var username = req.body.username
-  var password = req.body.password
+  let username = req.body.username
+  let password = req.body.password
 
   // ...some logic here...
   // Get username and password from a DB
@@ -101,7 +105,7 @@ app.post("/login", (req,res) => {
       // fill the payload with data that can be used later by auth'd routes
       const payload = {"user": username}
       // Sign token with a timeout (2h)
-      var token = jwt.sign( payload, secret, {"expiresIn": config.expire} )
+      let token = jwt.sign( payload, secret, {"expiresIn": config.expire} )
       // Prepare the reply
       res.json({
           "success" : true,
@@ -124,6 +128,7 @@ app.post("/login", (req,res) => {
 // there's something wrong (possibly a 404)
 
 app.use((req, res, next) => {
+  logger.error("404 not found !")
   // Create a 404 error
   const error = new Error("Not found");
   error.status = 404;
@@ -144,8 +149,30 @@ app.use((error, req, res, next) => {
 
 // Start Server ----------------------------------------------------------------
 
-var port = process.env.PORT || config.port;
-app.listen(port, () => {
-  console.log("Server is up and listening on "+port+""...")
-})
-8088
+let server, port 
+let protocol = process.env.PROTOCOL || 'https'
+if (fs.existsSync('./SSL/privkey.pem') && config.portSSL && protocol === 'https' ) {
+  // Get SSL Certificate
+  const privateKey = fs.readFileSync('./SSL/privkey.pem', 'utf8')
+  const certificate = fs.readFileSync('./SSL/cert.pem', 'utf8')
+  const ca = fs.readFileSync('./SSL/chain.pem', 'utf8')
+  // Get Credentials for server
+  const credentials = {
+    key: privateKey,
+    cert: certificate,
+    ca: ca
+  }
+  // Start a development HTTPS server.
+  server = https.createServer(credentials,app)
+  port = process.env.PORT || config.portSSL
+} else {
+  protocol = 'http'
+  server = http.createServer(app)
+  port = process.env.PORT || config.port
+}
+
+server.listen( port, () => {
+  console.log("Server started on protocol "+protocol+" and port "+port+"...")
+} )
+
+
