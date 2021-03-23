@@ -152,7 +152,6 @@ app.use((error, req, res, next) => {
 
 // Start Server ----------------------------------------------------------------
 
-<<<<<<< HEAD
 let server, port 
 let protocol = process.env.PROTOCOL || 'https'
 if (fs.existsSync('./SSL/privkey.pem') && config.portSSL && protocol === 'https' ) {
@@ -180,9 +179,3 @@ server.listen( port, () => {
 } )
 
 
-=======
-var port = process.env.PORT || config.port;
-app.listen(port, () => {
-  console.log("Server is up and listening on "+port+"...")
-})
->>>>>>> 8db14f6528873d189d640705315836cf73b1f203
