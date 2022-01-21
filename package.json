@@ -29,7 +29,7 @@
     "express-ipfilter": "^1.1.2",
     "helmet": "^4.4.1",
     "jsonwebtoken": "^8.5.1",
-    "log4js": "^6.3.0",
+    "log4js": "^6.4.0",
     "morgan": "^1.9.1",
     "web3": "^1.0.0-beta.55",
     "xss-clean": "^0.1.1"
