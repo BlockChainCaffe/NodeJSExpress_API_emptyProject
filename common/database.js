@@ -4,14 +4,6 @@ const mysql = require('mysql')
 const logger = require('../common/logger.js').logger
 
 
-// Global vars
-var LUTable_breeds      // <--- might get HUGE
-var LUTable_countries
-var LUTable_document_type
-var LUTable_regions     // <--- might get HUGE
-var LUTable_roles
-var LUTable_species
-
 /* ------------------------------------------------------------------
     POOL SETUP
 -------------------------------------------------------------------*/
@@ -97,21 +89,4 @@ async function table2obj (table) {
 module.exports = {
     pool,
     runQuery,
-    getEoaTxList,
-    addEoaTx,
-    isKnownFluid,
-    isKnownHuman,
-
-    // validDocType,
-
-    addKnownHuman,
-    addKnownFluid,
-
-    reloadLookup,
-    LUTable_breeds,
-    LUTable_countries,
-    LUTable_document_type,
-    LUTable_regions,
-    LUTable_roles,
-    LUTable_species,
 }

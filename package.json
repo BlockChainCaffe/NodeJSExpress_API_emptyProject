@@ -1,37 +1,20 @@
 {
-  "name": "nodejs-contract-api",
+  "name": "gamification",
   "version": "1.0.0",
-  "description": "A NodeJS api thing to interact with smart contracts via web3js",
+  "description": "Gut Gamification API",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@bitbucket.org/EmcySquare/nodejs-contract-api.git"
-  },
-  "keywords": [
-    "api",
-    "nodejs",
-    "node",
-    "web3js",
-    "geth",
-    "ethereum",
-    "smart",
-    "contract"
-  ],
   "author": "Marco Crotta",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/EmcySquare/nodejs-contract-api#readme",
+  "license": "UNLICENSED",
   "dependencies": {
-    "body-parser": "^1.19.0",
-    "express": "^4.17.1",
-    "express-ipfilter": "^1.1.2",
-    "helmet": "^4.4.1",
-    "jsonwebtoken": "^8.5.1",
-    "log4js": "^6.3.0",
-    "morgan": "^1.9.1",
-    "web3": "^1.0.0-beta.55",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.1.1",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "log4js": "^6.9.1",
+    "nodemon": "^2.0.22",
     "xss-clean": "^0.1.1"
   }
 }
